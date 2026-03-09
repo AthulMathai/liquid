@@ -82,7 +82,7 @@ export async function parseCsv(
             error: null,
           });
         },
-        error: (error) => {
+        error: (error: Error) => {
           resolve({
             data: null,
             error: error instanceof Error ? error : new Error(String(error)),

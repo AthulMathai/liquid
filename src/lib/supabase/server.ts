@@ -1,5 +1,3 @@
-"use client";
-
 import { createClient } from "@supabase/supabase-js";
 
 function getRequiredEnv(name: string): string {
@@ -12,14 +10,16 @@ function getRequiredEnv(name: string): string {
   return value;
 }
 
-const supabaseUrl = getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL");
-const supabaseAnonKey = getRequiredEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+export function createSupabaseServerClient() {
+  const supabaseUrl = getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL");
+  const supabaseAnonKey = getRequiredEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY");
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-  },
-});
+  return createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  });
+}
 
-export default supabase;
+export default createSupabaseServerClient;

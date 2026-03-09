@@ -15,9 +15,9 @@ import AppShell from "@/components/shared/AppShell";
 import ImageCaptureUpload from "@/components/products/ImageCaptureUpload";
 
 type ProductDetailPageProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 const product = {
@@ -95,10 +95,11 @@ const recentOrderActivity = [
   },
 ];
 
-export default function ProductDetailPage({
+export default async function ProductDetailPage({
   params,
 }: ProductDetailPageProps) {
-  const productId = decodeURIComponent(params.id);
+  const { id } = await params;
+  const productId = decodeURIComponent(id);
 
   return (
     <AppShell
@@ -174,6 +175,7 @@ export default function ProductDetailPage({
                   width: "100%",
                   height: 380,
                   objectFit: "cover",
+                  display: "block",
                 }}
               />
             </div>
@@ -374,6 +376,7 @@ export default function ProductDetailPage({
                           width: "100%",
                           height: 180,
                           objectFit: "cover",
+                          display: "block",
                         }}
                       />
                     </div>

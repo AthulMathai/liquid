@@ -15,9 +15,9 @@ import {
 import AppShell from "@/components/shared/AppShell";
 
 type OrderDetailPageProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 const order = {
@@ -75,8 +75,11 @@ const timeline = [
   },
 ];
 
-export default function OrderDetailPage({ params }: OrderDetailPageProps) {
-  const orderId = decodeURIComponent(params.id);
+export default async function OrderDetailPage({
+  params,
+}: OrderDetailPageProps) {
+  const { id } = await params;
+  const orderId = decodeURIComponent(id);
 
   return (
     <AppShell

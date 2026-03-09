@@ -180,7 +180,7 @@ function parseCsvText(csvText: string): Promise<IncomingRow[]> {
 
         resolve(rows);
       },
-      error: (error) => reject(error),
+      error: (error: Error) => reject(error),
     });
   });
 }

@@ -66,80 +66,88 @@ function parseNullableInteger(value: unknown) {
 
 export const productStatusSchema = z.enum(productStatusValues);
 
-export const createProductSchema = z
-  .object({
-    sku: z.preprocess(
-      normalizeSkuInput,
-      z.string().trim().min(1, "sku is required.").max(120)
-    ),
-    barcode_value: z.preprocess(
-      emptyStringToNull,
-      z.string().trim().max(255).nullable().optional()
-    ),
-    item_number: z.preprocess(
-      emptyStringToNull,
-      z.string().trim().max(255).nullable().optional()
-    ),
-    title: z.preprocess(
-      emptyStringToNull,
-      z.string().trim().max(255).nullable().optional()
-    ),
-    description: z.preprocess(
-      emptyStringToNull,
-      z.string().trim().max(5000).nullable().optional()
-    ),
-    category: z.preprocess(
-      emptyStringToNull,
-      z.string().trim().max(255).nullable().optional()
-    ),
-    brand: z.preprocess(
-      emptyStringToNull,
-      z.string().trim().max(255).nullable().optional()
-    ),
-    model: z.preprocess(
-      emptyStringToNull,
-      z.string().trim().max(255).nullable().optional()
-    ),
-    condition: z.preprocess(
-      emptyStringToNull,
-      z.string().trim().max(100).nullable().optional()
-    ),
-    cost: z.preprocess(
-      parseNullableMoney,
-      z.number().min(0, "cost must be 0 or greater.").default(0)
-    ),
-    listed_price: z.preprocess(
-      parseNullableMoney,
-      z.number().min(0, "listed_price must be 0 or greater.").default(0)
-    ),
-    min_acceptable_price: z.preprocess(
-      parseNullableMoney,
-      z.number().min(0, "min_acceptable_price must be 0 or greater.").default(0)
-    ),
-    on_hand_qty: z.preprocess(
-      parseNullableInteger,
-      z.number().int().min(0, "on_hand_qty must be 0 or greater.").default(0)
-    ),
-    reserved_qty: z.preprocess(
-      parseNullableInteger,
-      z.number().int().min(0, "reserved_qty must be 0 or greater.").default(0)
-    ),
-    status: productStatusSchema.default("draft"),
-    notes: z.preprocess(
-      emptyStringToNull,
-      z.string().trim().max(5000).nullable().optional()
-    ),
-  })
+const productSchemaFields = {
+  sku: z.preprocess(
+    normalizeSkuInput,
+    z.string().trim().min(1, "sku is required.").max(120)
+  ),
+  barcode_value: z.preprocess(
+    emptyStringToNull,
+    z.string().trim().max(255).nullable().optional()
+  ),
+  item_number: z.preprocess(
+    emptyStringToNull,
+    z.string().trim().max(255).nullable().optional()
+  ),
+  title: z.preprocess(
+    emptyStringToNull,
+    z.string().trim().max(255).nullable().optional()
+  ),
+  description: z.preprocess(
+    emptyStringToNull,
+    z.string().trim().max(5000).nullable().optional()
+  ),
+  category: z.preprocess(
+    emptyStringToNull,
+    z.string().trim().max(255).nullable().optional()
+  ),
+  brand: z.preprocess(
+    emptyStringToNull,
+    z.string().trim().max(255).nullable().optional()
+  ),
+  model: z.preprocess(
+    emptyStringToNull,
+    z.string().trim().max(255).nullable().optional()
+  ),
+  condition: z.preprocess(
+    emptyStringToNull,
+    z.string().trim().max(100).nullable().optional()
+  ),
+  cost: z.preprocess(
+    parseNullableMoney,
+    z.number().min(0, "cost must be 0 or greater.").default(0)
+  ),
+  listed_price: z.preprocess(
+    parseNullableMoney,
+    z.number().min(0, "listed_price must be 0 or greater.").default(0)
+  ),
+  min_acceptable_price: z.preprocess(
+    parseNullableMoney,
+    z.number().min(0, "min_acceptable_price must be 0 or greater.").default(0)
+  ),
+  on_hand_qty: z.preprocess(
+    parseNullableInteger,
+    z.number().int().min(0, "on_hand_qty must be 0 or greater.").default(0)
+  ),
+  reserved_qty: z.preprocess(
+    parseNullableInteger,
+    z.number().int().min(0, "reserved_qty must be 0 or greater.").default(0)
+  ),
+  status: productStatusSchema.default("draft"),
+  notes: z.preprocess(
+    emptyStringToNull,
+    z.string().trim().max(5000).nullable().optional()
+  ),
+} satisfies z.ZodRawShape;
+
+const baseProductSchema = z.object(productSchemaFields);
+
+export const createProductSchema = baseProductSchema
   .refine((value) => value.reserved_qty <= value.on_hand_qty, {
     message: "reserved_qty cannot be greater than on_hand_qty.",
     path: ["reserved_qty"],
   })
-  .refine((value) => value.min_acceptable_price <= value.listed_price || value.listed_price === 0, {
-    message: "min_acceptable_price cannot be greater than listed_price.",
-    path: ["min_acceptable_price"],
-  });
+  .refine(
+    (value) =>
+      value.min_acceptable_price <= value.listed_price ||
+      value.listed_price === 0,
+    {
+      message: "min_acceptable_price cannot be greater than listed_price.",
+      path: ["min_acceptable_price"],
+    }
+  );
 
-export const updateProductSchema = createProductSchema
+export const updateProductSchema = baseProductSchema
   .partial()
   .refine((value) => Object.keys(value).length > 0, {
     message: "At least one field must be provided for update.",

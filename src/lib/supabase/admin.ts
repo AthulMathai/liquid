@@ -10,11 +10,11 @@ function getRequiredEnv(name: string): string {
   return value;
 }
 
-export function createSupabaseServerClient() {
+export function createSupabaseAdminClient() {
   const supabaseUrl = getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL");
-  const supabaseAnonKey = getRequiredEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+  const supabaseServiceRoleKey = getRequiredEnv("SUPABASE_SERVICE_ROLE_KEY");
 
-  return createClient(supabaseUrl, supabaseAnonKey, {
+  return createClient(supabaseUrl, supabaseServiceRoleKey, {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
@@ -22,4 +22,4 @@ export function createSupabaseServerClient() {
   });
 }
 
-export default createSupabaseServerClient;
+export default createSupabaseAdminClient;

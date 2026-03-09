@@ -1,30 +1,24 @@
+"use client";
+
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+function getRequiredEnv(name: string): string {
+  const value = process.env[name];
 
-if (!supabaseUrl) {
-  throw new Error(
-    "Missing NEXT_PUBLIC_SUPABASE_URL. Add it to your environment variables."
-  );
+  if (!value || !value.trim()) {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+
+  return value;
 }
 
-if (!supabaseAnonKey) {
-  throw new Error(
-    "Missing NEXT_PUBLIC_SUPABASE_ANON_KEY. Add it to your environment variables."
-  );
-}
+const supabaseUrl = getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL");
+const supabaseAnonKey = getRequiredEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY");
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true,
-  },
-  global: {
-    headers: {
-      "x-application-name": "liquidation-hub",
-    },
   },
 });
 
